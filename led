@@ -1,0 +1,67 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h> // 用于usleep函数
+#include <time.h> // 用于time和srand函数
+
+// 终端光标控制函数
+void hideCursor() {
+    printf("\033[?25l"); // 隐藏光标
+}
+
+void showCursor() {
+    printf("\033[?25h"); // 显示光标
+}
+
+// 清屏函数，适用于Unix/Linux系统
+void clearScreen() {
+    system("clear");
+}
+
+// 生成随机颜色的ANSI转义码
+void printColoredLED(int state) {
+    const char *colors[] = {
+        "\033[1;31m", // 红色
+        "\033[1;32m", // 绿色
+        "\033[1;33m", // 黄色
+        "\033[1;34m", // 蓝色
+        "\033[1;35m", // 紫色
+        "\033[1;36m"  // 青色
+    };
+    const char *backgrounds[] = {
+        "\033[41m", // 红色背景
+        "\033[42m", // 绿色背景
+        "\033[43m", // 黄色背景
+        "\033[44m", // 蓝色背景
+        "\033[45m", // 紫色背景
+        "\033[46m"  // 青色背景
+    };
+
+    if (state) {
+        int colorIndex = rand() % (sizeof(colors) / sizeof(colors[0]));
+        int backgroundIndex = rand() % (sizeof(backgrounds) / sizeof(backgrounds[0]));
+        printf("%s%sLED: ON\n\033[0m", backgrounds[backgroundIndex], colors[colorIndex]);
+    } else {
+        printf("\033[0mLED: OFF\n");
+    }
+}
+
+// 模拟LED动画
+void simulateLEDAnimation() {
+    srand(time(NULL)); // 初始化随机数种子
+    int ledState = 0; // 0表示熄灭，1表示点亮
+
+    while (1) {
+        clearScreen(); // 清屏
+        printColoredLED(ledState); // 打印彩色LED
+
+        ledState = !ledState; // 切换LED状态
+        usleep(500000); // 等待500毫秒
+    }
+}
+
+int main() {
+    hideCursor(); // 隐藏光标
+    simulateLEDAnimation();
+    showCursor(); // 显示光标
+    return 0;
+}
